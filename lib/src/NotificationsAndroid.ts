@@ -28,4 +28,32 @@ export class NotificationsAndroid {
   public setNotificationChannel(notificationChannel: NotificationChannel) {
     return this.commands.setNotificationChannel(notificationChannel);
   }
+
+  /**
+  * deleteNotificationChannel
+  */
+  deleteNotificationChannel(channelId: string) {
+    return this.commands.deleteNotificationChannel(channelId);
+  }
+
+  /**
+   * channelExists
+   */
+  channelExists(channelId: string) {
+    return this.commands.channelExists(channelId);
+  }
+
+  /**
+   * channelBlocked
+   */
+  channelBlocked(channelId: string) {
+    return this.commands.channelBlocked(channelId);
+  }
+
+  /**
+   * getChannels
+   */
+  getChannels() {
+    return this.commands.getChannels();
+  }
 }

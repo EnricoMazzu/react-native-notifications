@@ -8,16 +8,13 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class JsIOHelper {
+    
     public boolean sendEventToJS(String eventName, Bundle data, ReactContext reactContext) {
-        if (reactContext != null) {
-            sendEventToJS(eventName, Arguments.fromBundle(data), reactContext);
-            return true;
-        }
-        return false;
+        return sendEventToJS(eventName, Arguments.fromBundle(data), reactContext);
     }
 
     public boolean sendEventToJS(String eventName, WritableMap data, ReactContext reactContext) {
-        if (reactContext != null) {
+        if (reactContext != null && reactContext.hasActiveReactInstance()) {
             reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, data);
             return true;
         }

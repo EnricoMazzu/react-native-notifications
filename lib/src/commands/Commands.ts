@@ -91,4 +91,20 @@ export class Commands {
   public setNotificationChannel(notificationChannel: NotificationChannel) {
     this.nativeCommandsSender.setNotificationChannel(notificationChannel);
   }
+
+  public deleteNotificationChannel(channelId: string) {
+    this.nativeCommandsSender.deleteNotificationChannel(channelId);
+  }
+  
+  public channelExists(channelId: string) {
+    return this.nativeCommandsSender.channelExists(channelId);
+  }
+  
+  public channelBlocked(channelId: string) {
+    return this.nativeCommandsSender.channelBlocked(channelId);
+  }
+  
+  public getChannels() {
+    return this.nativeCommandsSender.getChannels();
+  }
 }

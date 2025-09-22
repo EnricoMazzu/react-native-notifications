@@ -8,7 +8,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationChannel implements INotificationChannel {
@@ -75,6 +75,64 @@ public class NotificationChannel implements INotificationChannel {
             );
         }
         notificationManager.createNotificationChannel(channel);
+    }
+
+    @Override
+    public void deleteNotificationChannel(String channelId) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+        final NotificationManager notificationManager = (NotificationManager) mContext
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.deleteNotificationChannel(channelId);
+    }
+
+    @Override
+    public boolean channelExists(String channelId) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return false;
+        }
+        final NotificationManager notificationManager = (NotificationManager) mContext
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        android.app.NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
+        return channel != null;
+    }
+
+    @Override
+    public boolean channelBlocked(String channelId) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return false;
+        }
+        final NotificationManager notificationManager = (NotificationManager) mContext
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        android.app.NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
+        return NotificationManager.IMPORTANCE_NONE == channel.getImportance();
+    }
+
+    @Override
+    public List<String> listChannels() {
+
+        List<String> channels = new ArrayList<>();
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            return channels;
+
+        final NotificationManager notificationManager = (NotificationManager) mContext
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (notificationManager == null)
+            return channels;
+
+        List<android.app.NotificationChannel> listChannels = notificationManager.getNotificationChannels();
+
+        for(android.app.NotificationChannel channel : listChannels) {
+            channels.add(channel.getId());
+        }
+
+        return channels;
     }
 
     @Override

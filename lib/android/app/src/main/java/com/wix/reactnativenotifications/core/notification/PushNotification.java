@@ -1,5 +1,10 @@
 package com.wix.reactnativenotifications.core.notification;
 
+import static com.wix.reactnativenotifications.Defs.LOGTAG;
+import static com.wix.reactnativenotifications.Defs.NOTIFICATION_OPENED_EVENT_NAME;
+import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_BACKGROUND_EVENT_NAME;
+import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_EVENT_NAME;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,11 +23,6 @@ import com.wix.reactnativenotifications.core.AppLifecycleFacadeHolder;
 import com.wix.reactnativenotifications.core.InitialNotificationHolder;
 import com.wix.reactnativenotifications.core.JsIOHelper;
 import com.wix.reactnativenotifications.core.NotificationIntentAdapter;
-
-import static com.wix.reactnativenotifications.Defs.NOTIFICATION_OPENED_EVENT_NAME;
-import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_EVENT_NAME;
-import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_BACKGROUND_EVENT_NAME;
-import static com.wix.reactnativenotifications.Defs.LOGTAG;
 
 public class PushNotification implements IPushNotification {
 
@@ -181,6 +181,10 @@ public class PushNotification implements IPushNotification {
         if (colorResID != 0) {
             int color = mContext.getResources().getColor(colorResID);
             notification.setColor(color);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notification.setColorized(true);
+            }
+            notification.setStyle(new Notification.DecoratedCustomViewStyle());
         }
     }
 

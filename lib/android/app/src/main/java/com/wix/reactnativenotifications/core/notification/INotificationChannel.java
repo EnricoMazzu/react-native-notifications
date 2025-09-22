@@ -1,5 +1,7 @@
 package com.wix.reactnativenotifications.core.notification;
 
+import java.util.List;
+
 public interface INotificationChannel {
 
     /**
@@ -9,5 +11,13 @@ public interface INotificationChannel {
      */
     void setNotificationChannel();
 
+    void deleteNotificationChannel(String channelId);
+
+    boolean channelExists(String channelId);
+
+    boolean channelBlocked(String channelId);
+
+    List<String> listChannels();
+    
     NotificationChannelProps asProps();
 }

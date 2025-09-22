@@ -2,7 +2,6 @@ package com.wix.reactnativenotifications.core;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,9 +20,7 @@ public class NotificationIntentAdapter {
         } else {
             Intent mainActivityIntent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
             mainActivityIntent.putExtra(PUSH_NOTIFICATION_EXTRA_NAME, notification.asBundle());
-            TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(appContext);
-            taskStackBuilder.addNextIntentWithParentStack(mainActivityIntent);
-            return taskStackBuilder.getPendingIntent((int) System.currentTimeMillis(), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+            return PendingIntent.getActivities(appContext,(int) System.currentTimeMillis(), new Intent[]{mainActivityIntent},PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         }
     }
 

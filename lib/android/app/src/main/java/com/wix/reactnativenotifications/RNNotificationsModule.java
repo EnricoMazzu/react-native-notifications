@@ -1,5 +1,7 @@
 package com.wix.reactnativenotifications;
 
+import static com.wix.reactnativenotifications.Defs.LOGTAG;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -15,6 +17,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.wix.reactnativenotifications.core.AppLifecycleFacadeHolder;
 import com.wix.reactnativenotifications.core.InitialNotificationHolder;
 import com.wix.reactnativenotifications.core.NotificationIntentAdapter;
@@ -27,8 +30,6 @@ import com.wix.reactnativenotifications.core.notification.PushNotificationProps;
 import com.wix.reactnativenotifications.core.notificationdrawer.IPushNotificationsDrawer;
 import com.wix.reactnativenotifications.core.notificationdrawer.PushNotificationsDrawer;
 import com.wix.reactnativenotifications.fcm.FcmInstanceIdRefreshHandlerService;
-
-import static com.wix.reactnativenotifications.Defs.LOGTAG;
 
 public class RNNotificationsModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
@@ -63,7 +64,7 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     @Override
     public void onNewIntent(Intent intent) {
         if (NotificationIntentAdapter.canHandleIntent(intent)) {
-            Bundle notificationData = intent.getExtras();
+            Bundle notificationData = NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent);
             final IPushNotification notification = PushNotification.get(getReactApplicationContext().getApplicationContext(), notificationData);
             if (notification != null) {
                 notification.onOpened();
@@ -140,6 +141,47 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
                 notificationChannelProps
         );
         notificationsDrawer.setNotificationChannel();
+    }
+
+    @ReactMethod
+    public void getChannels(final Promise promise) {
+        INotificationChannel notificationsDrawer = NotificationChannel.get(
+                getReactApplicationContext().getApplicationContext(),
+                null
+        );
+        WritableArray array = Arguments.fromList(notificationsDrawer.listChannels());
+        promise.resolve(array);
+    }
+
+    @ReactMethod
+    void deleteChannel(String channelId) {
+        INotificationChannel notificationsDrawer = NotificationChannel.get(
+                getReactApplicationContext().getApplicationContext(),
+                null
+        );
+        notificationsDrawer.deleteNotificationChannel(channelId);
+    }
+
+    @ReactMethod
+    public void channelExists(String channelId, Promise promise) {
+        INotificationChannel notificationsDrawer = NotificationChannel.get(
+                getReactApplicationContext().getApplicationContext(),
+                null
+        );
+
+        boolean channelExists = notificationsDrawer.channelExists(channelId);
+        promise.resolve(new Boolean(channelExists));
+    }
+
+    @ReactMethod
+    public void channelBlocked(String channelId, Promise promise) {
+        INotificationChannel notificationsDrawer = NotificationChannel.get(
+                getReactApplicationContext().getApplicationContext(),
+                null
+        );
+
+        boolean channelBlocked = notificationsDrawer.channelBlocked(channelId);
+        promise.resolve(new Boolean(channelBlocked));
     }
 
     protected void startFcmIntentService(String extraFlag) {
