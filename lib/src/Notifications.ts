@@ -102,6 +102,34 @@ export class NotificationsRoot {
   }
 
   /**
+   * deleteNotificationChannel
+   */
+  deleteNotificationChannel(channelId: string) {
+    return this.android.deleteNotificationChannel(channelId);
+  }
+
+  /**
+   * channelExists
+   */
+  channelExists(channelId: string) {
+    return this.android.channelExists(channelId);
+  }
+
+  /**
+   * channelBlocked
+   */
+  channelBlocked(channelId: string) {
+    return this.android.channelBlocked(channelId);
+  }
+
+  /**
+   * getChannels
+   */
+  getChannels() {
+    return this.android.getChannels();
+  }
+
+  /**
    * Obtain the events registry instance
    */
   public events(): EventsRegistry {

@@ -27,6 +27,10 @@ interface NativeCommandsModule {
   finishHandlingAction(notificationId: string): void;
   setNotificationChannel(notificationChannel: NotificationChannel): void;
   finishHandlingBackgroundAction(notificationId: string, backgroundFetchResult: string): void;
+  deleteNotificationChannel(channelId: string): void;
+  channelExists(channelId: string): Promise<boolean>;
+  channelBlocked(channelId: string): Promise<boolean>;
+  getChannels(): Promise<string[]>;
 }
 
 export class NativeCommandsSender {
@@ -109,6 +113,22 @@ export class NativeCommandsSender {
 
   setNotificationChannel(notificationChannel: NotificationChannel) {
     this.nativeCommandsModule.setNotificationChannel(notificationChannel);
+  }
+
+  deleteNotificationChannel(channelId: string): void {
+    this.nativeCommandsModule.deleteNotificationChannel(channelId);
+  }
+
+  channelExists(channelId: string): Promise<boolean> {
+    return this.nativeCommandsModule.channelExists(channelId);
+  }
+  
+  channelBlocked(channelId: string): Promise<boolean> {
+    return this.nativeCommandsModule.channelBlocked(channelId);
+  }
+  
+  getChannels(): Promise<string[]> {
+    return this.nativeCommandsModule.getChannels();
   }
 
   finishHandlingBackgroundAction(notificationId: string, backgroundFetchResult: string): void {
