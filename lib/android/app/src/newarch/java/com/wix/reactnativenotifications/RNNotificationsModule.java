@@ -93,6 +93,7 @@ public class RNNotificationsModule extends NativeRNNotificationsSpec implements 
         try {
             final PushNotificationProps notification = InitialNotificationHolder.getInstance().get();
             if (notification == null) {
+                promise.resolve(null);
                 return;
             }
 

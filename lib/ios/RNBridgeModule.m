@@ -3,6 +3,16 @@
 #import "RCTConvert+RNNotifications.h"
 #import "RNNotificationsStore.h"
 #import <React/RCTBridge.h>
+#import <React/RCTLog.h>
+#import <math.h>
+
+static NSNumber *RNNotificationIdNumber(double notificationId) {
+    if (floor(notificationId) == notificationId) {
+        return @((long long)notificationId);
+    }
+
+    return @(notificationId);
+}
 
 @implementation RNBridgeModule {
     RNCommandsHandler* _commandsHandler;
@@ -15,9 +25,6 @@ RCT_EXPORT_MODULE();
 - (instancetype)init {
     self = [super init];
     _commandsHandler = [[RNCommandsHandler alloc] init];
-    for (NSString *event in [self supportedEvents]) {
-        [self addListener:event];
-    }
     return self;
 }
 
@@ -110,15 +117,20 @@ RCT_EXPORT_METHOD(getBadgeCount:(RCTPromiseResolveBlock)resolve reject:(RCTPromi
 }
 
 RCT_EXPORT_METHOD(setBadgeCount:(double)count) {
+    if (floor(count) != count) {
+        RCTLogWarn(@"setBadgeCount expects an integer value, received %f", count);
+        return;
+    }
+
     [_commandsHandler setBadgeCount:(int)count];
 }
 
 RCT_EXPORT_METHOD(postLocalNotification:(NSDictionary *)notification notificationId:(double)notificationId) {
-    [_commandsHandler postLocalNotification:notification withId:@((int)notificationId)];
+    [_commandsHandler postLocalNotification:notification withId:RNNotificationIdNumber(notificationId)];
 }
 
 RCT_EXPORT_METHOD(cancelLocalNotification:(double)notificationId) {
-    [_commandsHandler cancelLocalNotification:@((int)notificationId)];
+    [_commandsHandler cancelLocalNotification:RNNotificationIdNumber(notificationId)];
 }
 
 RCT_EXPORT_METHOD(cancelAllLocalNotifications) {
