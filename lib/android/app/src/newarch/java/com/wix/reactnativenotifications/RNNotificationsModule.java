@@ -9,15 +9,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.module.annotations.ReactModule;
 import com.wix.reactnativenotifications.core.AppLifecycleFacadeHolder;
 import com.wix.reactnativenotifications.core.InitialNotificationHolder;
 import com.wix.reactnativenotifications.core.NotificationIntentAdapter;
@@ -31,7 +33,8 @@ import com.wix.reactnativenotifications.core.notificationdrawer.IPushNotificatio
 import com.wix.reactnativenotifications.core.notificationdrawer.PushNotificationsDrawer;
 import com.wix.reactnativenotifications.fcm.FcmInstanceIdRefreshHandlerService;
 
-public class RNNotificationsModule extends ReactContextBaseJavaModule implements ActivityEventListener {
+@ReactModule(name = RNNotificationsModule.NAME)
+public class RNNotificationsModule extends NativeRNNotificationsSpec implements ActivityEventListener {
     public static final String NAME = "RNBridgeModule";
 
     public RNNotificationsModule(Application application, ReactApplicationContext reactContext) {
@@ -43,6 +46,7 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
         reactContext.addActivityEventListener(this);
     }
 
+    @NonNull
     @Override
     public String getName() {
         return NAME;
@@ -74,12 +78,14 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
+    @Override
     public void refreshToken() {
         if(BuildConfig.DEBUG) Log.d(LOGTAG, "Native method invocation: refreshToken()");
         startFcmIntentService(FcmInstanceIdRefreshHandlerService.EXTRA_MANUAL_REFRESH);
     }
 
     @ReactMethod
+    @Override
     public void getInitialNotification(final Promise promise) {
         if(BuildConfig.DEBUG) Log.d(LOGTAG, "Native method invocation: getInitialNotification");
         Object result = null;
@@ -100,42 +106,49 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
-    public void postLocalNotification(ReadableMap notificationPropsMap, int notificationId) {
+    @Override
+    public void postLocalNotification(ReadableMap notificationPropsMap, double notificationId) {
         if(BuildConfig.DEBUG) Log.d(LOGTAG, "Native method invocation: postLocalNotification");
         final Bundle notificationProps = Arguments.toBundle(notificationPropsMap);
         final IPushNotification pushNotification = PushNotification.get(getReactApplicationContext().getApplicationContext(), notificationProps);
-        pushNotification.onPostRequest(notificationId);
+        pushNotification.onPostRequest((int) notificationId);
     }
 
     @ReactMethod
-    public void cancelLocalNotification(int notificationId) {
+    @Override
+    public void cancelLocalNotification(double notificationId) {
         IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(getReactApplicationContext().getApplicationContext());
-        notificationsDrawer.onNotificationClearRequest(notificationId);
+        notificationsDrawer.onNotificationClearRequest((int) notificationId);
     }
 
     @ReactMethod
+    @Override
     public void setCategories(ReadableArray categories) {
-    
+
     }
-    
+
     public void cancelDeliveredNotification(String tag, int notificationId) {
         IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(getReactApplicationContext().getApplicationContext());
         notificationsDrawer.onNotificationClearRequest(tag, notificationId);
     }
 
     @ReactMethod
+    @Override
     public void isRegisteredForRemoteNotifications(Promise promise) {
         boolean hasPermission = NotificationManagerCompatFacade.from(getReactApplicationContext()).areNotificationsEnabled();
-        promise.resolve(new Boolean(hasPermission));
+        promise.resolve(Boolean.valueOf(hasPermission));
     }
 
-    @ReactMethod void removeAllDeliveredNotifications() {
+    @ReactMethod
+    @Override
+    public void removeAllDeliveredNotifications() {
         IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(getReactApplicationContext().getApplicationContext());
         notificationsDrawer.onAllNotificationsClearRequest();
     }
 
     @ReactMethod
-    void setNotificationChannel(ReadableMap notificationChannelPropsMap) {
+    @Override
+    public void setNotificationChannel(ReadableMap notificationChannelPropsMap) {
         final Bundle notificationChannelProps = Arguments.toBundle(notificationChannelPropsMap);
         INotificationChannel notificationsDrawer = NotificationChannel.get(
                 getReactApplicationContext().getApplicationContext(),
@@ -145,6 +158,7 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
+    @Override
     public void getChannels(final Promise promise) {
         INotificationChannel notificationsDrawer = NotificationChannel.get(
                 getReactApplicationContext().getApplicationContext(),
@@ -155,7 +169,8 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
-    void deleteChannel(String channelId) {
+    @Override
+    public void deleteChannel(String channelId) {
         INotificationChannel notificationsDrawer = NotificationChannel.get(
                 getReactApplicationContext().getApplicationContext(),
                 null
@@ -164,6 +179,7 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
+    @Override
     public void channelExists(String channelId, Promise promise) {
         INotificationChannel notificationsDrawer = NotificationChannel.get(
                 getReactApplicationContext().getApplicationContext(),
@@ -171,10 +187,11 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
         );
 
         boolean channelExists = notificationsDrawer.channelExists(channelId);
-        promise.resolve(new Boolean(channelExists));
+        promise.resolve(Boolean.valueOf(channelExists));
     }
 
     @ReactMethod
+    @Override
     public void channelBlocked(String channelId, Promise promise) {
         INotificationChannel notificationsDrawer = NotificationChannel.get(
                 getReactApplicationContext().getApplicationContext(),
@@ -182,7 +199,80 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
         );
 
         boolean channelBlocked = notificationsDrawer.channelBlocked(channelId);
-        promise.resolve(new Boolean(channelBlocked));
+        promise.resolve(Boolean.valueOf(channelBlocked));
+    }
+
+    @ReactMethod
+    @Override
+    public void requestPermissions(ReadableMap options) {
+    }
+
+    @ReactMethod
+    @Override
+    public void abandonPermissions() {
+    }
+
+    @ReactMethod
+    @Override
+    public void registerPushKit() {
+    }
+
+    @ReactMethod
+    @Override
+    public void getBadgeCount(Promise promise) {
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    @Override
+    public void setBadgeCount(double count) {
+    }
+
+    @ReactMethod
+    @Override
+    public void cancelAllLocalNotifications() {
+    }
+
+    @ReactMethod
+    @Override
+    public void checkPermissions(Promise promise) {
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    @Override
+    public void removeDeliveredNotifications(ReadableArray identifiers) {
+    }
+
+    @ReactMethod
+    @Override
+    public void getDeliveredNotifications(Promise promise) {
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    @Override
+    public void finishPresentingNotification(String notificationId, ReadableMap notificationCompletion) {
+    }
+
+    @ReactMethod
+    @Override
+    public void finishHandlingAction(String notificationId) {
+    }
+
+    @ReactMethod
+    @Override
+    public void finishHandlingBackgroundAction(String notificationId, String backgroundFetchResult) {
+    }
+
+    @ReactMethod
+    @Override
+    public void addListener(String eventName) {
+    }
+
+    @ReactMethod
+    @Override
+    public void removeListeners(double count) {
     }
 
     protected void startFcmIntentService(String extraFlag) {

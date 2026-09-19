@@ -1,10 +1,10 @@
-import { NativeModules } from 'react-native';
 import { Notification } from '../DTO/Notification';
 import { NotificationCompletion } from '../interfaces/NotificationCompletion';
 import { NotificationPermissions } from '../interfaces/NotificationPermissions';
 import { NotificationCategory } from '../interfaces/NotificationCategory';
 import { NotificationChannel } from '../interfaces/NotificationChannel';
 import { NotificationPermissionOptions } from '../interfaces/NotificationPermissions';
+import nativeCommandsModule from './NativeRNNotificationsModule';
 
 interface NativeCommandsModule {
   getInitialNotification(): Promise<Object>;
@@ -36,7 +36,7 @@ interface NativeCommandsModule {
 export class NativeCommandsSender {
   private readonly nativeCommandsModule: NativeCommandsModule;
   constructor() {
-    this.nativeCommandsModule = NativeModules.RNBridgeModule;
+    this.nativeCommandsModule = nativeCommandsModule as unknown as NativeCommandsModule;
   }
 
   postLocalNotification(notification: Notification, id: number) {

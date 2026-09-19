@@ -2,7 +2,6 @@
 #import "RNCommandsHandler.h"
 #import "RCTConvert+RNNotifications.h"
 #import "RNNotificationsStore.h"
-#import <React/RCTBridgeDelegate.h>
 #import <React/RCTBridge.h>
 
 @implementation RNBridgeModule {
@@ -16,11 +15,26 @@ RCT_EXPORT_MODULE();
 - (instancetype)init {
     self = [super init];
     _commandsHandler = [[RNCommandsHandler alloc] init];
+    for (NSString *event in [self supportedEvents]) {
+        [self addListener:event];
+    }
     return self;
 }
 
 + (BOOL)requiresMainQueueSetup {
     return YES;
+}
+
+- (NSArray<NSString *> *)supportedEvents {
+    return @[RNRegistered,
+             RNRegistrationDenied,
+             RNRegistrationFailed,
+             RNPushKitRegistered,
+             RNNotificationReceived,
+             RNNotificationReceivedBackground,
+             RNNotificationOpened,
+             RNPushKitNotificationReceived,
+             RNAppNotificationSettingsLinked];
 }
 
 - (void)setBridge:(RCTBridge *)bridge {
@@ -32,6 +46,29 @@ RCT_EXPORT_MODULE();
 
 - (dispatch_queue_t)methodQueue {
     return dispatch_get_main_queue();
+}
+
++ (void)sendEvent:(NSString *)event body:(NSDictionary *)body {
+    [[NSNotificationCenter defaultCenter] postNotificationName:event
+                                                        object:self
+                                                      userInfo:body];
+}
+
+- (void)startObserving {
+    for (NSString *event in [self supportedEvents]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleNotification:)
+                                                     name:event
+                                                   object:nil];
+    }
+}
+
+- (void)stopObserving {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)handleNotification:(NSNotification *)notification {
+    [self sendEventWithName:notification.name body:notification.userInfo];
 }
 
 #pragma mark - JS interface
@@ -52,12 +89,12 @@ RCT_EXPORT_METHOD(finishHandlingAction:(NSString *)completionKey) {
     [_commandsHandler finishHandlingAction:completionKey];
 }
 
-RCT_EXPORT_METHOD(finishPresentingNotification:(NSString *)completionKey presentingOptions:(NSDictionary *)presentingOptions) {
-    [_commandsHandler finishPresentingNotification:completionKey presentingOptions:presentingOptions];
+RCT_EXPORT_METHOD(finishPresentingNotification:(NSString *)notificationId notificationCompletion:(NSDictionary *)notificationCompletion) {
+    [_commandsHandler finishPresentingNotification:notificationId presentingOptions:notificationCompletion];
 }
 
-RCT_EXPORT_METHOD(finishHandlingBackgroundAction:(NSString *)completionKey backgroundFetchResult:(NSString *)backgroundFetchResult) {
-    [_commandsHandler finishHandlingBackgroundAction:completionKey backgroundFetchResult:backgroundFetchResult];
+RCT_EXPORT_METHOD(finishHandlingBackgroundAction:(NSString *)notificationId backgroundFetchResult:(NSString *)backgroundFetchResult) {
+    [_commandsHandler finishHandlingBackgroundAction:notificationId backgroundFetchResult:backgroundFetchResult];
 }
 
 RCT_EXPORT_METHOD(abandonPermissions) {
@@ -76,7 +113,7 @@ RCT_EXPORT_METHOD(setBadgeCount:(int)count) {
     [_commandsHandler setBadgeCount:count];
 }
 
-RCT_EXPORT_METHOD(postLocalNotification:(NSDictionary *)notification withId:(nonnull NSNumber *)notificationId) {
+RCT_EXPORT_METHOD(postLocalNotification:(NSDictionary *)notification notificationId:(nonnull NSNumber *)notificationId) {
     [_commandsHandler postLocalNotification:notification withId:notificationId];
 }
 
@@ -114,4 +151,3 @@ RCT_EXPORT_METHOD(getDeliveredNotifications:(RCTPromiseResolveBlock)resolve reje
 #endif
 
 @end
-

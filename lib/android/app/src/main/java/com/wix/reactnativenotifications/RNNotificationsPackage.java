@@ -6,9 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.facebook.react.ReactPackage;
+import androidx.annotation.Nullable;
+
+import com.facebook.react.TurboReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.module.model.ReactModuleInfo;
+import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.uimanager.ViewManager;
 import com.google.firebase.FirebaseApp;
 import com.wix.reactnativenotifications.core.AppLifecycleFacade;
@@ -22,9 +26,11 @@ import com.wix.reactnativenotifications.core.notificationdrawer.PushNotification
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.AppVisibilityListener, Application.ActivityLifecycleCallbacks {
+public class RNNotificationsPackage extends TurboReactPackage implements AppLifecycleFacade.AppVisibilityListener, Application.ActivityLifecycleCallbacks {
 
     private final Application mApplication;
 
@@ -36,14 +42,38 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
         application.registerActivityLifecycleCallbacks(this);
     }
 
+    @Nullable
     @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList(new RNNotificationsModule(mApplication, reactContext));
+    public NativeModule getModule(String name, ReactApplicationContext reactContext) {
+        if (RNNotificationsModule.NAME.equals(name)) {
+            return new RNNotificationsModule(mApplication, reactContext);
+        }
+
+        return null;
     }
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public ReactModuleInfoProvider getReactModuleInfoProvider() {
+        return () -> {
+            final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
+            moduleInfos.put(
+                    RNNotificationsModule.NAME,
+                    new ReactModuleInfo(
+                            RNNotificationsModule.NAME,
+                            RNNotificationsModule.NAME,
+                            false,
+                            false,
+                            false,
+                            false,
+                            BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
+                    ));
+            return moduleInfos;
+        };
     }
 
     @Override

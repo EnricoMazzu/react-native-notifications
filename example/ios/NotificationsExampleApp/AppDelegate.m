@@ -25,7 +25,7 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   
-  [RNNotifications startMonitorNotifications];
+  [RNNotifications startMonitorNotificationsWithLaunchOptions:launchOptions];
   
   return YES;
 }

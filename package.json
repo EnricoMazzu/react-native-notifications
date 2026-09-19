@@ -78,6 +78,14 @@
     "type": "git",
     "url": "https://github.com/wix/react-native-notifications.git"
   },
+  "codegenConfig": {
+    "name": "RNNotificationsSpec",
+    "type": "modules",
+    "jsSrcsDir": "lib/src",
+    "android": {
+      "javaPackageName": "com.wix.reactnativenotifications"
+    }
+  },
   "homepage": "https://github.com/wix/react-native-notifications",
   "bugs": {
     "url": "https://github.com/wix/react-native-notifications/issues"

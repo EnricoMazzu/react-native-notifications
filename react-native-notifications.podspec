@@ -1,6 +1,7 @@
 require 'json'
 
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
+is_new_arch_enabled = ENV['RCT_NEW_ARCH_ENABLED'] == '1'
 
 Pod::Spec.new do |s|
   s.name           = 'react-native-notifications'
@@ -18,8 +19,11 @@ Pod::Spec.new do |s|
   s.requires_arc   = true
 
   s.preserve_paths = 'LICENSE', 'README.md', 'package.json', 'notification.ios.js', 'notification.android.js', 'index.android.js', 'index.ios.js'
-  s.source_files   = 'lib/ios/*.{h,m}'
+  s.source_files   = 'lib/ios/*.{h,m,mm}'
   s.exclude_files  = "lib/ios/RNNotificationsTests/**/*.*", "lib/ios/OCMock/**/*.*"
-
-  s.dependency 'React-Core'
+  if is_new_arch_enabled
+    install_modules_dependencies(s)
+  else
+    s.dependency 'React-Core'
+  end
 end

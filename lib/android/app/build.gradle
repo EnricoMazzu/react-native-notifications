@@ -19,6 +19,36 @@ def kotlinVersion = safeExtGet('kotlinVersion', DEFAULT_KOTLIN_VERSION)
 def kotlinStdlib = safeExtGet('kotlinStdlib', DEFAULT_KOTLIN_STDLIB_VERSION)
 def firebaseVersion = safeExtGet('firebaseVersion', DEFAULT_FIREBASE_MESSAGING_VERSION)
 
+def isNewArchitectureEnabled() {
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+def resolveReactNativeDirectory() {
+    def reactNativeFromNodeModules = file("${rootProject.projectDir}/../../../node_modules/react-native")
+    if (reactNativeFromNodeModules.exists()) {
+        return reactNativeFromNodeModules
+    }
+
+    def reactNativeFromProjectNodeModules = file("${projectDir}/../../../node_modules/react-native")
+    if (reactNativeFromProjectNodeModules.exists()) {
+        return reactNativeFromProjectNodeModules
+    }
+
+    throw new Exception("[react-native-notifications] Unable to resolve react-native location in node_modules.")
+}
+
+def getReactNativeMinorVersion() {
+    def reactProperties = new Properties()
+    file("${resolveReactNativeDirectory()}/ReactAndroid/gradle.properties").withInputStream { reactProperties.load(it) }
+
+    def reactNativeVersion = reactProperties.getProperty("VERSION_NAME")
+    return reactNativeVersion.startsWith("0.0.0-") ? 1000 : reactNativeVersion.split("\\.")[1].toInteger()
+}
+
+if (isNewArchitectureEnabled()) {
+    apply plugin: 'com.facebook.react'
+}
+
 Object findReactNativePackageJson() {
     def searchPath = 'node_modules/react-native/package.json'
     def projectDir = project.projectDir.toString() + '/'
@@ -53,8 +83,19 @@ android {
         targetSdkVersion androidTargetSdkVersion
         versionCode 1
         versionName "1.0"
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+    sourceSets {
+        main {
+            java {
+                if (isNewArchitectureEnabled()) {
+                    exclude 'com/wix/reactnativenotifications/RNNotificationsModule.java'
+                    srcDirs += ['src/newarch/java']
+                }
+            }
         }
     }
     compileOptions {
@@ -122,7 +163,11 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:$kotlinStdlib:$kotlinVersion"
     implementation "com.google.firebase:firebase-messaging:$firebaseVersion"
-    implementation 'com.facebook.react:react-native:+'
+    if (isNewArchitectureEnabled() && getReactNativeMinorVersion() < 71) {
+        implementation project(":ReactAndroid")
+    } else {
+        implementation 'com.facebook.react:react-native:+'
+    }
 
     // tests
     testImplementation 'junit:junit:4.12'

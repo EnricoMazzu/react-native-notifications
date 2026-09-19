@@ -1,15 +1,16 @@
-import { NativeModules, NativeEventEmitter, EventEmitter, EmitterSubscription } from 'react-native';
+import { NativeEventEmitter, EventEmitter, EmitterSubscription } from 'react-native';
 import {
   Registered, RegistrationError, RegisteredPushKit, NotificationResponse
 } from '../interfaces/NotificationEvents';
 import { Notification } from '../DTO/Notification';
 import { NotificationActionResponse } from '../interfaces/NotificationActionResponse';
 import { NotificationFactory } from '../DTO/NotificationFactory';
+import nativeNotificationsModule from './NativeRNNotificationsModule';
 
 export class NativeEventsReceiver {
   private emitter: EventEmitter;
   constructor(private readonly notificationFactory: NotificationFactory = new NotificationFactory()) {
-    this.emitter = new NativeEventEmitter(NativeModules.RNEventEmitter);
+    this.emitter = new NativeEventEmitter(nativeNotificationsModule as never);
   }
 
   public registerRemoteNotificationsRegistered(callback: (event: Registered) => void): EmitterSubscription {

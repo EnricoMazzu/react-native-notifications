@@ -37,6 +37,10 @@
     [[self sharedInstance] startMonitorNotifications];
 }
 
++ (void)startMonitorNotificationsWithLaunchOptions:(NSDictionary *)launchOptions {
+    [[self sharedInstance] startMonitorNotificationsWithLaunchOptions:launchOptions];
+}
+
 + (void)startMonitorPushKitNotifications {
     [[self sharedInstance] startMonitorPushKitNotifications];
 }
@@ -72,6 +76,15 @@
     [[UNUserNotificationCenter currentNotificationCenter] setDelegate:_notificationCenterMulticast];
     
     [_notificationCenterMulticast addNativeDelegate:_notificationCenterListener];
+}
+
+- (void)startMonitorNotificationsWithLaunchOptions:(NSDictionary *)launchOptions {
+    NSDictionary* initialNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (initialNotification) {
+        [_store setInitialNotification:initialNotification];
+    }
+
+    [self startMonitorNotifications];
 }
 
 - (void)startMonitorPushKitNotifications {

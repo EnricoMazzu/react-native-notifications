@@ -8,6 +8,7 @@
 + (instancetype)sharedInstance;
 
 + (void)startMonitorNotifications;
++ (void)startMonitorNotificationsWithLaunchOptions:(NSDictionary *)launchOptions;
 + (void)startMonitorPushKitNotifications;
 
 + (void)didReceiveBackgroundNotification:(NSDictionary *)userInfo withCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
