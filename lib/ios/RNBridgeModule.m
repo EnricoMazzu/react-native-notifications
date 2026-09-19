@@ -109,16 +109,16 @@ RCT_EXPORT_METHOD(getBadgeCount:(RCTPromiseResolveBlock)resolve reject:(RCTPromi
     [_commandsHandler getBadgeCount:resolve reject:reject];
 }
 
-RCT_EXPORT_METHOD(setBadgeCount:(int)count) {
-    [_commandsHandler setBadgeCount:count];
+RCT_EXPORT_METHOD(setBadgeCount:(double)count) {
+    [_commandsHandler setBadgeCount:(int)count];
 }
 
-RCT_EXPORT_METHOD(postLocalNotification:(NSDictionary *)notification notificationId:(nonnull NSNumber *)notificationId) {
-    [_commandsHandler postLocalNotification:notification withId:notificationId];
+RCT_EXPORT_METHOD(postLocalNotification:(NSDictionary *)notification notificationId:(double)notificationId) {
+    [_commandsHandler postLocalNotification:notification withId:@((int)notificationId)];
 }
 
-RCT_EXPORT_METHOD(cancelLocalNotification:(nonnull NSNumber *)notificationId) {
-    [_commandsHandler cancelLocalNotification:notificationId];
+RCT_EXPORT_METHOD(cancelLocalNotification:(double)notificationId) {
+    [_commandsHandler cancelLocalNotification:@((int)notificationId)];
 }
 
 RCT_EXPORT_METHOD(cancelAllLocalNotifications) {
@@ -132,6 +132,32 @@ RCT_EXPORT_METHOD(isRegisteredForRemoteNotifications:(RCTPromiseResolveBlock)res
 RCT_EXPORT_METHOD(checkPermissions:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
     [_commandsHandler checkPermissions:resolve reject:reject];
+}
+
+RCT_EXPORT_METHOD(refreshToken) {
+}
+
+RCT_EXPORT_METHOD(setNotificationChannel:(NSDictionary *)notificationChannel) {
+}
+
+RCT_EXPORT_METHOD(deleteChannel:(NSString *)channelId) {
+}
+
+RCT_EXPORT_METHOD(channelExists:(NSString *)channelId
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    resolve(@(NO));
+}
+
+RCT_EXPORT_METHOD(channelBlocked:(NSString *)channelId
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    resolve(@(NO));
+}
+
+RCT_EXPORT_METHOD(getChannels:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+    resolve(@[]);
 }
 
 #if !TARGET_OS_TV

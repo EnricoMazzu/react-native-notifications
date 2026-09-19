@@ -43,6 +43,14 @@ _Upcoming: local notifications, background-state Rx queue (iOS equivalent)_
 - [API](https://wix.github.io/react-native-notifications/api/general-api)
 - [Documentation](https://wix.github.io/react-native-notifications/)
 
+# React Native New Architecture
+
+The package now includes TurboModule/codegen scaffolding for React Native's New Architecture while preserving the legacy native module path.
+
+- Android uses TurboModule-compatible package registration.
+- iOS exposes the notifications module as an event-capable native module and provides a TurboModule entry point.
+- The example app passes `launchOptions` through `startMonitorNotificationsWithLaunchOptions:` so initial notifications also work without relying on the legacy bridge.
+
 # License
 
 The MIT License.

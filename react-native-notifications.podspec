@@ -22,7 +22,23 @@ Pod::Spec.new do |s|
   s.source_files   = 'lib/ios/*.{h,m,mm}'
   s.exclude_files  = "lib/ios/RNNotificationsTests/**/*.*", "lib/ios/OCMock/**/*.*"
   if is_new_arch_enabled
-    install_modules_dependencies(s)
+    if respond_to?(:install_modules_dependencies)
+      install_modules_dependencies(s)
+    else
+      use_react_native_codegen!(
+        s,
+        :react_native_path => '../react-native',
+        :js_srcs_dir => 'lib/src',
+        :library_name => 'RNNotificationsSpec',
+        :library_type => 'modules'
+      ) if respond_to?(:use_react_native_codegen!)
+
+      s.dependency 'React-Core'
+      s.dependency 'React-Codegen'
+      s.dependency 'React-callinvoker'
+      s.dependency 'ReactCommon/turbomodule/core'
+      s.dependency 'RCT-Folly'
+    end
   else
     s.dependency 'React-Core'
   end
