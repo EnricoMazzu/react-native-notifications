@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.ReactContext;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.wix.reactnativenotifications.BuildConfig;
@@ -90,7 +91,26 @@ public class FcmToken implements IFcmToken {
 
     protected void sendTokenToJS() {
         AppLifecycleFacade facade = AppLifecycleFacadeHolder.get();
-        final ReactContext reactContext = facade.getRunningReactContext();
+        ReactContext reactContext = facade.getRunningReactContext();
+
+        if (reactContext == null) {
+            // Try New Architecture first (ReactHost) - available in RN 0.76+
+            try {
+                reactContext = ((ReactApplication) mAppContext).getReactHost().getCurrentReactContext();
+            } catch (NoSuchMethodError | RuntimeException e) {
+                // getReactHost() doesn't exist in older RN versions or throws in some cases
+            }
+        }
+
+        // Fallback to Old Architecture if New Architecture didn't work
+        if (reactContext == null) {
+            try {
+                final ReactInstanceManager instanceManager = ((ReactApplication) mAppContext).getReactNativeHost().getReactInstanceManager();
+                reactContext = instanceManager.getCurrentReactContext();
+            } catch (RuntimeException e) {
+                // getReactNativeHost() throws RuntimeException in New Architecture
+            }
+        }
 
         // Note: Cannot assume react-context exists cause this is an async dispatched service.
         if (reactContext != null && reactContext.hasActiveCatalystInstance()) {

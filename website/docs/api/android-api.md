@@ -37,3 +37,39 @@ Notifications.setNotificationChannel({
     vibrationPattern: [200, 1000, 500, 1000, 500],
 })
 ```
+
+## deleteNotificationChannel()
+Delete an existing notification channel by ID. No-op on Android < 8.0.
+
+```js
+Notifications.android.deleteNotificationChannel('my-channel');
+// or via the root object:
+Notifications.deleteNotificationChannel('my-channel');
+```
+
+## channelExists()
+Returns `true` if a notification channel with the given ID exists. Always returns `false` on Android < 8.0.
+
+```js
+const exists: boolean = await Notifications.android.channelExists('my-channel');
+// or via the root object:
+const exists: boolean = await Notifications.channelExists('my-channel');
+```
+
+## channelBlocked()
+Returns `true` if the user has blocked the notification channel (importance set to `IMPORTANCE_NONE`). Always returns `false` on Android < 8.0.
+
+```js
+const blocked: boolean = await Notifications.android.channelBlocked('my-channel');
+// or via the root object:
+const blocked: boolean = await Notifications.channelBlocked('my-channel');
+```
+
+## getChannels()
+Returns the list of existing notification channel IDs. Returns an empty array on Android < 8.0.
+
+```js
+const channelIds: string[] = await Notifications.android.getChannels();
+// or via the root object:
+const channelIds: string[] = await Notifications.getChannels();
+```

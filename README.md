@@ -37,6 +37,27 @@ Apps using React Native Notifications may target iOS 10 and Android 5.0 (API 21)
 
 _Upcoming: local notifications, background-state Rx queue (iOS equivalent)_
 
+# Fork additions (vs. wix/react-native-notifications)
+
+This fork adds the following Android channel management APIs, exposed both on `Notifications` directly and on `Notifications.android`:
+
+| Method | Description |
+|---|---|
+| `deleteNotificationChannel(channelId)` | Delete a channel by ID |
+| `channelExists(channelId): Promise<boolean>` | Check if a channel exists |
+| `channelBlocked(channelId): Promise<boolean>` | Check if a channel is blocked by the user |
+| `getChannels(): Promise<string[]>` | List all channel IDs |
+
+All four methods are no-ops / return safe defaults on Android < 8.0 (API 26).
+
+It also includes the following Android bug fixes:
+- `JsIOHelper`: guards event emission with `hasActiveReactInstance()` to avoid crashes when React context is not ready
+- `FcmToken`: uses `AppLifecycleFacadeHolder` to get the React context instead of accessing `ReactInstanceManager` directly
+- `NotificationIntentAdapter`: replaced `TaskStackBuilder` with `PendingIntent.getActivities()` to fix Android 12+ trampoline restriction
+- `PushNotification`: applies `setColorized` and `DecoratedCustomViewStyle` when a custom notification color is set
+- `RNNotificationsModule.onNewIntent`: extracts notification data via `NotificationIntentAdapter.extractPendingNotificationDataFromIntent` instead of raw `intent.getExtras()`
+- `FcmInstanceIdListenerService`: dispatches notifications with key `CA-Notification-ID` to `com.creditagricole.services.MFJobService` via reflection
+
 # Quick Links
 
 - [Getting Started](https://wix.github.io/react-native-notifications/docs/getting-started)
