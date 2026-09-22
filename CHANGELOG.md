@@ -1,4 +1,16 @@
 # Changelog
+
+# 5.1.1 (fork CyberArk)
+## Changed
+### Android
+* `FcmInstanceIdListenerService`: la logica di dispatch a `MFJobService` (specifica dell'app host) è stata commentata e spostata lato app tramite `INotificationsApplication` + sottoclasse di `PushNotification`. Vedere [how-to-customize.md](how-to-customize.md) per i passi di migrazione.
+
+## Aligned with AppHubFE patch
+I seguenti fix presenti nella patch `react-native-notifications+5.1.0.patch` di AppHubFE sono stati applicati anche a questo fork (vedere [fork_from_hn_diff.md](fork_from_hn_diff.md)):
+* `FcmToken.java`: aggiunto fallback per New Architecture (RN 0.76+) tramite `getReactHost()` e `getReactNativeHost()`.
+* `react-native.config.js`: corretta la stringa `packageInstance` da `reactNativeHost.getApplication()` a `getApplication()`.
+* `NotificationManagerCompatFacade.java`: migrazione da `android.support.*` a `androidx.*`.
+
 # 2.1.0
 ## Added
 * react-native 0.60 Support
