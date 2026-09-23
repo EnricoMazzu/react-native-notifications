@@ -1,5 +1,6 @@
 import groovy.json.JsonSlurper
 
+apply plugin: 'com.facebook.react'
 apply plugin: 'com.android.library'
 
 def safeExtGet(prop, fallback) {

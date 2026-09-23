@@ -31,7 +31,7 @@ import com.wix.reactnativenotifications.core.notificationdrawer.IPushNotificatio
 import com.wix.reactnativenotifications.core.notificationdrawer.PushNotificationsDrawer;
 import com.wix.reactnativenotifications.fcm.FcmInstanceIdRefreshHandlerService;
 
-public class RNNotificationsModule extends ReactContextBaseJavaModule implements ActivityEventListener {
+public class RNNotificationsModule extends NativeRNBridgeModuleSpec implements ActivityEventListener {
 
     public static final String NAME = "RNBridgeModule";
 
@@ -42,11 +42,6 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
         }
 
         reactContext.addActivityEventListener(this);
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 
     @ReactMethod
@@ -107,24 +102,62 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
-    public void postLocalNotification(ReadableMap notificationPropsMap, int notificationId) {
+    public void postLocalNotification(ReadableMap notificationPropsMap, double notificationId) {
         if(BuildConfig.DEBUG) Log.d(LOGTAG, "Native method invocation: postLocalNotification");
         final Bundle notificationProps = Arguments.toBundle(notificationPropsMap);
         final IPushNotification pushNotification = PushNotification.get(getReactApplicationContext().getApplicationContext(), notificationProps);
-        pushNotification.onPostRequest(notificationId);
+        pushNotification.onPostRequest((int) notificationId);
     }
 
     @ReactMethod
-    public void cancelLocalNotification(int notificationId) {
+    public void cancelLocalNotification(double notificationId) {
         IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(getReactApplicationContext().getApplicationContext());
-        notificationsDrawer.onNotificationClearRequest(notificationId);
+        notificationsDrawer.onNotificationClearRequest((int) notificationId);
     }
 
     @ReactMethod
-    public void setCategories(ReadableArray categories) {
-    
+    public void setCategories(ReadableArray categories) {}
+
+    @ReactMethod
+    public void cancelAllLocalNotifications() {
+        IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(getReactApplicationContext().getApplicationContext());
+        notificationsDrawer.onAllNotificationsClearRequest();
     }
-    
+
+    @ReactMethod
+    public void getDeliveredNotifications(final Promise promise) { promise.resolve(Arguments.createArray()); }
+
+    @ReactMethod
+    public void removeDeliveredNotifications(ReadableArray identifiers) {}
+
+    @ReactMethod
+    public void requestPermissions(ReadableMap options) {}
+
+    @ReactMethod
+    public void abandonPermissions() {}
+
+    @ReactMethod
+    public void checkPermissions(final Promise promise) { promise.resolve(Arguments.createMap()); }
+
+    // iOS-only — stubs required by NativeRNBridgeModuleSpec
+    @ReactMethod
+    public void registerPushKit() {}
+
+    @ReactMethod
+    public void getBadgeCount(final Promise promise) { promise.resolve(0); }
+
+    @ReactMethod
+    public void setBadgeCount(double count) {}
+
+    @ReactMethod
+    public void finishPresentingNotification(String notificationId, ReadableMap presentingOptions) {}
+
+    @ReactMethod
+    public void finishHandlingAction(String notificationId) {}
+
+    @ReactMethod
+    public void finishHandlingBackgroundAction(String notificationId, String backgroundFetchResult) {}
+
     public void cancelDeliveredNotification(String tag, int notificationId) {
         IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(getReactApplicationContext().getApplicationContext());
         notificationsDrawer.onNotificationClearRequest(tag, notificationId);
@@ -136,13 +169,13 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
         promise.resolve(new Boolean(hasPermission));
     }
 
-    @ReactMethod void removeAllDeliveredNotifications() {
+    @ReactMethod public void removeAllDeliveredNotifications() {
         IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(getReactApplicationContext().getApplicationContext());
         notificationsDrawer.onAllNotificationsClearRequest();
     }
 
     @ReactMethod
-    void setNotificationChannel(ReadableMap notificationChannelPropsMap) {
+    public void setNotificationChannel(ReadableMap notificationChannelPropsMap) {
         final Bundle notificationChannelProps = Arguments.toBundle(notificationChannelPropsMap);
         INotificationChannel notificationsDrawer = NotificationChannel.get(
                 getReactApplicationContext().getApplicationContext(),
@@ -162,7 +195,7 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
     }
 
     @ReactMethod
-    void deleteChannel(String channelId) {
+    public void deleteNotificationChannel(String channelId) {
         INotificationChannel notificationsDrawer = NotificationChannel.get(
                 getReactApplicationContext().getApplicationContext(),
                 null

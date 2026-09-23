@@ -10,6 +10,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 public class JsIOHelper {
     
     public boolean sendEventToJS(String eventName, Bundle data, ReactContext reactContext) {
+        if (data == null) return false;
         return sendEventToJS(eventName, Arguments.fromBundle(data), reactContext);
     }
 

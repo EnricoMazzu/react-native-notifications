@@ -15,6 +15,9 @@ RCT_EXPORT_MODULE();
 - (instancetype)init {
     self = [super init];
     _commandsHandler = [[RNCommandsHandler alloc] init];
+    for (NSString *event in [self supportedEvents]) {
+        [self addListener:event];
+    }
     return self;
 }
 
