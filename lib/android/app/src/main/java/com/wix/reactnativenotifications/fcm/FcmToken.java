@@ -97,8 +97,10 @@ public class FcmToken implements IFcmToken {
             // Try New Architecture first (ReactHost) - available in RN 0.76+
             try {
                 reactContext = ((ReactApplication) mAppContext).getReactHost().getCurrentReactContext();
-            } catch (NoSuchMethodError | RuntimeException e) {
-                // getReactHost() doesn't exist in older RN versions or throws in some cases
+            } catch (NoSuchMethodError e) {
+                // getReactHost() not available in this RN version
+            } catch (RuntimeException e) {
+                Log.w(LOGTAG, "getReactHost() threw unexpectedly", e);
             }
         }
 

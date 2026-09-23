@@ -20,6 +20,17 @@ public class NotificationIntentAdapter {
         } else {
             Intent mainActivityIntent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
             mainActivityIntent.putExtra(PUSH_NOTIFICATION_EXTRA_NAME, notification.asBundle());
+            // NOTE (finding #5): TaskStackBuilder.addNextIntentWithParentStack() ripristinerebbe il back stack
+            // sintetico dichiarato nel manifest (android:parentActivityName). Non applicato — da valutare
+            // in quanto cambia il comportamento di navigazione lato app. Fix da abilitare:
+            //
+            // import android.app.TaskStackBuilder;
+            // TaskStackBuilder stackBuilder = TaskStackBuilder.create(appContext);
+            // stackBuilder.addNextIntentWithParentStack(mainActivityIntent);
+            // return stackBuilder.getPendingIntent(
+            //     (int) System.currentTimeMillis(),
+            //     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE
+            // );
             return PendingIntent.getActivities(appContext,(int) System.currentTimeMillis(), new Intent[]{mainActivityIntent},PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         }
     }
