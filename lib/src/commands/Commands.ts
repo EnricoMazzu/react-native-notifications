@@ -44,7 +44,7 @@ export class Commands {
     this.nativeCommandsSender.registerPushKit();
   }
 
-  public setCategories(categories: [NotificationCategory?]) {
+  public setCategories(categories: NotificationCategory[]) {
     this.nativeCommandsSender.setCategories(categories);
   }
 
@@ -81,7 +81,9 @@ export class Commands {
   }
 
   public getDeliveredNotifications(): Promise<Notification[]> {
-    return this.nativeCommandsSender.getDeliveredNotifications();
+    return this.nativeCommandsSender.getDeliveredNotifications().then((notifications) => {
+      return notifications.map((notification) => this.notificationFactory.fromPayload(notification));
+    });
   }
 
   public refreshToken() {

@@ -1,7 +1,6 @@
 import NativeRNBridgeModule, { Spec } from '../NativeRNBridgeModule';
 import { Notification } from '../DTO/Notification';
 import { NotificationCompletion } from '../interfaces/NotificationCompletion';
-import { NotificationPermissions } from '../interfaces/NotificationPermissions';
 import { NotificationCategory } from '../interfaces/NotificationCategory';
 import { NotificationChannel } from '../interfaces/NotificationChannel';
 import { NotificationPermissionOptions } from '../interfaces/NotificationPermissions';
@@ -36,7 +35,7 @@ export class NativeCommandsSender {
     return this.nativeCommandsModule.registerPushKit();
   }
 
-  setCategories(categories: [NotificationCategory?]) {
+  setCategories(categories: NotificationCategory[]) {
     this.nativeCommandsModule.setCategories(categories);
   }
 
@@ -72,7 +71,7 @@ export class NativeCommandsSender {
     return this.nativeCommandsModule.removeDeliveredNotifications(identifiers);
   }
 
-  public getDeliveredNotifications(): Promise<Notification[]> {
+  public getDeliveredNotifications(): Promise<object[]> {
     return this.nativeCommandsModule.getDeliveredNotifications();
   }
 

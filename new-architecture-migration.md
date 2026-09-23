@@ -281,7 +281,7 @@ public void addListener(String eventName) {}
 public void removeListeners(double count) {}
 ```
 
-> **Note:** Full conformance to the codegen-generated `NativeRNBridgeModuleSpec` interface (i.e. `extends NativeRNBridgeModuleSpec` instead of `ReactContextBaseJavaModule`) can be done once the host app runs the Android codegen step. The current implementation is compatible with New Architecture via the TurboReactPackage registration.
+> **Note:** Android currently keeps `RNNotificationsModule` on `ReactContextBaseJavaModule` and implements `ReactModuleWithSpec`/`TurboModule` instead of extending the codegen-generated `NativeRNBridgeModuleSpec`. This avoids a hard build-time dependency on host-side Android codegen while remaining compatible with New Architecture through `TurboReactPackage` registration.
 
 ---
 

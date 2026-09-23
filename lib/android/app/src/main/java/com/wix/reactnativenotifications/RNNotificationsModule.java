@@ -14,10 +14,12 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactModuleWithSpec;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.turbomodule.core.interfaces.TurboModule;
 import com.wix.reactnativenotifications.core.AppLifecycleFacadeHolder;
 import com.wix.reactnativenotifications.core.InitialNotificationHolder;
 import com.wix.reactnativenotifications.core.NotificationIntentAdapter;
@@ -31,7 +33,7 @@ import com.wix.reactnativenotifications.core.notificationdrawer.IPushNotificatio
 import com.wix.reactnativenotifications.core.notificationdrawer.PushNotificationsDrawer;
 import com.wix.reactnativenotifications.fcm.FcmInstanceIdRefreshHandlerService;
 
-public class RNNotificationsModule extends NativeRNBridgeModuleSpec implements ActivityEventListener {
+public class RNNotificationsModule extends ReactContextBaseJavaModule implements ReactModuleWithSpec, TurboModule, ActivityEventListener {
 
     public static final String NAME = "RNBridgeModule";
 
@@ -42,6 +44,11 @@ public class RNNotificationsModule extends NativeRNBridgeModuleSpec implements A
         }
 
         reactContext.addActivityEventListener(this);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     @ReactMethod
@@ -139,7 +146,7 @@ public class RNNotificationsModule extends NativeRNBridgeModuleSpec implements A
     @ReactMethod
     public void checkPermissions(final Promise promise) { promise.resolve(Arguments.createMap()); }
 
-    // iOS-only — stubs required by NativeRNBridgeModuleSpec
+    // iOS-only — stubs required by the shared JS spec
     @ReactMethod
     public void registerPushKit() {}
 
