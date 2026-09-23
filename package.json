@@ -44,6 +44,14 @@
     "pod-install": "pod install --project-directory=example/ios"
   },
   "nativePackage": true,
+  "codegenConfig": {
+    "name": "RNNotificationsSpec",
+    "type": "modules",
+    "jsSrcsDir": "lib/src",
+    "android": {
+      "javaPackageName": "com.wix.reactnativenotifications"
+    }
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"

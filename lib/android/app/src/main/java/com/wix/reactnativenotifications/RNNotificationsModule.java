@@ -33,6 +33,8 @@ import com.wix.reactnativenotifications.fcm.FcmInstanceIdRefreshHandlerService;
 
 public class RNNotificationsModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
+    public static final String NAME = "RNBridgeModule";
+
     public RNNotificationsModule(Application application, ReactApplicationContext reactContext) {
         super(reactContext);
         if (AppLifecycleFacadeHolder.get() instanceof ReactAppLifecycleFacade) {
@@ -44,8 +46,14 @@ public class RNNotificationsModule extends ReactContextBaseJavaModule implements
 
     @Override
     public String getName() {
-        return "RNBridgeModule";
+        return NAME;
     }
+
+    @ReactMethod
+    public void addListener(String eventName) {}
+
+    @ReactMethod
+    public void removeListeners(double count) {}
 
     @Override
     public void initialize() {

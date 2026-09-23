@@ -1,4 +1,4 @@
-import { NativeModules } from 'react-native';
+import NativeRNBridgeModule, { Spec } from '../NativeRNBridgeModule';
 import { Notification } from '../DTO/Notification';
 import { NotificationCompletion } from '../interfaces/NotificationCompletion';
 import { NotificationPermissions } from '../interfaces/NotificationPermissions';
@@ -6,37 +6,10 @@ import { NotificationCategory } from '../interfaces/NotificationCategory';
 import { NotificationChannel } from '../interfaces/NotificationChannel';
 import { NotificationPermissionOptions } from '../interfaces/NotificationPermissions';
 
-interface NativeCommandsModule {
-  getInitialNotification(): Promise<Object>;
-  postLocalNotification(notification: Notification, id: number): void;
-  requestPermissions(options: NotificationPermissionOptions): void;
-  abandonPermissions(): void;
-  refreshToken(): void;
-  registerPushKit(): void;
-  getBadgeCount(): Promise<number>;
-  setBadgeCount(count: number): void;
-  cancelLocalNotification(notificationId: number): void;
-  cancelAllLocalNotifications(): void;
-  isRegisteredForRemoteNotifications(): Promise<boolean>;
-  checkPermissions(): Promise<NotificationPermissions>;
-  removeDeliveredNotifications(identifiers: Array<string>): void;
-  removeAllDeliveredNotifications(): void;
-  getDeliveredNotifications(): Promise<Notification[]>;
-  setCategories(categories: [NotificationCategory?]): void;
-  finishPresentingNotification(notificationId: string, callback: NotificationCompletion): void;
-  finishHandlingAction(notificationId: string): void;
-  setNotificationChannel(notificationChannel: NotificationChannel): void;
-  finishHandlingBackgroundAction(notificationId: string, backgroundFetchResult: string): void;
-  deleteNotificationChannel(channelId: string): void;
-  channelExists(channelId: string): Promise<boolean>;
-  channelBlocked(channelId: string): Promise<boolean>;
-  getChannels(): Promise<string[]>;
-}
-
 export class NativeCommandsSender {
-  private readonly nativeCommandsModule: NativeCommandsModule;
+  private readonly nativeCommandsModule: Spec;
   constructor() {
-    this.nativeCommandsModule = NativeModules.RNBridgeModule;
+    this.nativeCommandsModule = NativeRNBridgeModule;
   }
 
   postLocalNotification(notification: Notification, id: number) {
