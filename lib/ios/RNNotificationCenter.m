@@ -1,4 +1,4 @@
-#import "RNEventEmitter.h"
+#import "RNBridgeModule.h"
 #import "RNNotificationCenter.h"
 #import "RCTConvert+RNNotifications.h"
 
@@ -42,7 +42,7 @@
             }];
         }
         if (!error && !granted) {
-          [RNEventEmitter sendEvent:RNRegistrationDenied body:nil];
+          [RNBridgeModule sendEvent:RNRegistrationDenied body:nil];
         }
     }];
 }

@@ -1,5 +1,4 @@
 #import "RNNotificationEventHandler.h"
-#import "RNEventEmitter.h"
 #import "RNNotificationUtils.h"
 #import "RCTConvert+RNNotifications.h"
 #import "RNNotificationParser.h"
@@ -16,21 +15,21 @@
 
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(id)deviceToken {
     NSString *tokenRepresentation = [deviceToken isKindOfClass:[NSString class]] ? deviceToken : [RNNotificationUtils deviceTokenToString:deviceToken];
-    [RNEventEmitter sendEvent:RNRegistered body:@{@"deviceToken": tokenRepresentation}];
+    [RNBridgeModule sendEvent:RNRegistered body:@{@"deviceToken": tokenRepresentation}];
 }
 
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-    [RNEventEmitter sendEvent:RNRegistrationFailed body:@{@"code": [NSNumber numberWithInteger:error.code], @"domain": error.domain, @"localizedDescription": error.localizedDescription}];
+    [RNBridgeModule sendEvent:RNRegistrationFailed body:@{@"code": [NSNumber numberWithInteger:error.code], @"domain": error.domain, @"localizedDescription": error.localizedDescription}];
 }
 
 - (void)didReceiveForegroundNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
     [_store setPresentationCompletionHandler:completionHandler withCompletionKey:notification.request.identifier];
-    [RNEventEmitter sendEvent:RNNotificationReceived body:[RNNotificationParser parseNotification:notification]];
+    [RNBridgeModule sendEvent:RNNotificationReceived body:[RNNotificationParser parseNotification:notification]];
 }
 
 - (void)didReceiveNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(void))completionHandler {
     [_store setActionCompletionHandler:completionHandler withCompletionKey:response.notification.request.identifier];
-    [RNEventEmitter sendEvent:RNNotificationOpened body:[RNNotificationParser parseNotificationResponse:response]];
+    [RNBridgeModule sendEvent:RNNotificationOpened body:[RNNotificationParser parseNotificationResponse:response]];
 }
 
 - (void)didReceiveBackgroundNotification:(NSDictionary *)userInfo withCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
@@ -45,7 +44,7 @@
             completionHandlerCalled = YES;
             dispatch_semaphore_signal(semaphore);
         } withCompletionKey:uuid];
-        [RNEventEmitter sendEvent:RNNotificationReceivedBackground body:[RNNotificationParser parseNotificationUserInfo:userInfo withIdentifier:uuid]];
+        [RNBridgeModule sendEvent:RNNotificationReceivedBackground body:[RNNotificationParser parseNotificationUserInfo:userInfo withIdentifier:uuid]];
         // Allow 25 seconds for this to process. If not finished call the callback with failed.
         dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 25 * NSEC_PER_SEC));
         if (!completionHandlerCalled) {

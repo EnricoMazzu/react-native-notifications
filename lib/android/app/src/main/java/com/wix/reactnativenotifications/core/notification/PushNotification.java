@@ -184,7 +184,7 @@ public class PushNotification implements IPushNotification {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notification.setColorized(true);
             }
-            notification.setStyle(new Notification.DecoratedCustomViewStyle());
+            // notification.setStyle(new Notification.DecoratedCustomViewStyle()); // fix da testare
         }
     }
 

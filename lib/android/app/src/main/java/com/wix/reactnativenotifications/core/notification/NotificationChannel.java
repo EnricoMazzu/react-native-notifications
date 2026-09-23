@@ -84,6 +84,7 @@ public class NotificationChannel implements INotificationChannel {
         }
         final NotificationManager notificationManager = (NotificationManager) mContext
                 .getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) return;
 
         notificationManager.deleteNotificationChannel(channelId);
     }
@@ -95,6 +96,7 @@ public class NotificationChannel implements INotificationChannel {
         }
         final NotificationManager notificationManager = (NotificationManager) mContext
                 .getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) return false;
 
         android.app.NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
         return channel != null;
@@ -107,8 +109,10 @@ public class NotificationChannel implements INotificationChannel {
         }
         final NotificationManager notificationManager = (NotificationManager) mContext
                 .getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) return false;
 
         android.app.NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
+        if (channel == null) return false;
         return NotificationManager.IMPORTANCE_NONE == channel.getImportance();
     }
 

@@ -4,18 +4,20 @@
 #import "RNNotificationsStore.h"
 #import <React/RCTBridgeDelegate.h>
 #import <React/RCTBridge.h>
+#import <ReactCommon/RCTTurboModule.h>
 
 @implementation RNBridgeModule {
     RNCommandsHandler* _commandsHandler;
 }
-
-@synthesize bridge = _bridge;
 
 RCT_EXPORT_MODULE();
 
 - (instancetype)init {
     self = [super init];
     _commandsHandler = [[RNCommandsHandler alloc] init];
+    for (NSString *event in [self supportedEvents]) {
+        [self addListener:event];
+    }
     return self;
 }
 
@@ -24,14 +26,43 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)setBridge:(RCTBridge *)bridge {
-    _bridge = bridge;
-    if ([_bridge.launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
-        [[RNNotificationsStore sharedInstance] setInitialNotification:[_bridge.launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
+    [super setBridge:bridge];
+    if ([bridge.launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
+        [[RNNotificationsStore sharedInstance] setInitialNotification:[bridge.launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
     }
 }
 
 - (dispatch_queue_t)methodQueue {
     return dispatch_get_main_queue();
+}
+
+- (NSArray<NSString *> *)supportedEvents {
+    return @[RNRegistered, RNRegistrationDenied, RNRegistrationFailed,
+             RNPushKitRegistered, RNNotificationReceived, RNNotificationReceivedBackground,
+             RNNotificationOpened, RNPushKitNotificationReceived, RNAppNotificationSettingsLinked];
+}
+
+- (void)startObserving {
+    for (NSString *event in [self supportedEvents]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleNotification:)
+                                                     name:event
+                                                   object:nil];
+    }
+}
+
+- (void)stopObserving {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)handleNotification:(NSNotification *)notification {
+    [self sendEventWithName:notification.name body:notification.userInfo];
+}
+
++ (void)sendEvent:(NSString *)event body:(NSDictionary *)body {
+    [[NSNotificationCenter defaultCenter] postNotificationName:event
+                                                        object:self
+                                                      userInfo:body];
 }
 
 #pragma mark - JS interface
@@ -112,6 +143,18 @@ RCT_EXPORT_METHOD(getDeliveredNotifications:(RCTPromiseResolveBlock)resolve reje
 }
 
 #endif
+
+// Android-only stubs required by the shared codegen spec
+RCT_EXPORT_METHOD(refreshToken) {}
+RCT_EXPORT_METHOD(setNotificationChannel:(NSDictionary *)channel) {}
+RCT_EXPORT_METHOD(deleteNotificationChannel:(NSString *)channelId) {}
+RCT_EXPORT_METHOD(channelExists:(NSString *)channelId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) { resolve(@NO); }
+RCT_EXPORT_METHOD(channelBlocked:(NSString *)channelId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) { resolve(@NO); }
+RCT_EXPORT_METHOD(getChannels:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) { resolve(@[]); }
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
+    return std::make_shared<facebook::react::NativeRNBridgeModuleSpecJSI>(params);
+}
 
 @end
 

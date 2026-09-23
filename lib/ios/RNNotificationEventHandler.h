@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 @import UserNotifications;
 #import "RNNotificationsStore.h"
-#import "RNEventEmitter.h"
+#import "RNBridgeModule.h"
 
 @interface RNNotificationEventHandler : NSObject
 
