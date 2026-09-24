@@ -20,6 +20,25 @@ def kotlinVersion = safeExtGet('kotlinVersion', DEFAULT_KOTLIN_VERSION)
 def kotlinStdlib = safeExtGet('kotlinStdlib', DEFAULT_KOTLIN_STDLIB_VERSION)
 def firebaseVersion = safeExtGet('firebaseVersion', DEFAULT_FIREBASE_MESSAGING_VERSION)
 
+Object findNodeModuleDir(moduleName) {
+    def searchPath = "node_modules/${moduleName}"
+    def projectDir = project.projectDir.toString() + '/'
+    def moduleDir = new File(projectDir + searchPath)
+    while (!moduleDir.exists()) {
+        searchPath = '../' + searchPath
+        moduleDir = new File(projectDir + searchPath)
+    }
+    return moduleDir
+}
+
+react {
+    jsRootDir = file('../../../lib/codegen')
+    reactNativeDir = findNodeModuleDir('react-native')
+    codegenDir = findNodeModuleDir('react-native-codegen')
+    libraryName = 'RNNotificationsSpec'
+    codegenJavaPackageName = 'com.wix.reactnativenotifications'
+}
+
 Object findReactNativePackageJson() {
     def searchPath = 'node_modules/react-native/package.json'
     def projectDir = project.projectDir.toString() + '/'

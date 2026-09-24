@@ -18,8 +18,14 @@ Pod::Spec.new do |s|
   s.requires_arc   = true
 
   s.preserve_paths = 'LICENSE', 'README.md', 'package.json', 'notification.ios.js', 'notification.android.js', 'index.android.js', 'index.ios.js'
-  s.source_files   = 'lib/ios/*.{h,m}'
+  s.source_files   = 'lib/ios/*.{h,m,mm}'
   s.exclude_files  = "lib/ios/RNNotificationsTests/**/*.*", "lib/ios/OCMock/**/*.*"
 
   s.dependency 'React-Core'
+  s.dependency 'React-Codegen'
+  s.dependency 'React-jsi'
+  s.dependency 'ReactCommon/turbomodule/core'
+  s.dependency 'RCT-Folly'
+  s.dependency 'RCTRequired'
+  s.dependency 'RCTTypeSafety'
 end

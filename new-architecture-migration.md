@@ -25,10 +25,10 @@ Two separate iOS native modules: `RNBridgeModule` for commands, `RNEventEmitter`
 |---|---|---|
 | JS commands | `NativeCommandsSender.ts` | `NativeRNBridgeModule` (TurboModule) |
 | JS events | `NativeEventsReceiver.ts` | `NativeEventEmitter(NativeRNBridgeModule)` on iOS, `DeviceEventEmitter` on Android |
-| Codegen spec | `NativeRNBridgeModule.ts` | `TurboModuleRegistry.getEnforcing('RNBridgeModule')` |
+| Codegen spec | `lib/codegen/NativeRNBridgeModule.js` | Flow TurboModule spec used by RN codegen |
 | Android module reg. | `RNNotificationsPackage.java` | `TurboReactPackage` → `getModule()` + `getReactModuleInfoProvider()` |
-| Android module | `RNNotificationsModule.java` | `ReactContextBaseJavaModule` + `addListener`/`removeListeners` stubs |
-| iOS module | `RNBridgeModule.h/.m` | Single `RCTEventEmitter <NativeRNBridgeModuleSpec>` — handles both commands and events |
+| Android module | `RNNotificationsModule.java` | `NativeRNBridgeModuleSpec` + `addListener`/`removeListeners` stubs |
+| iOS module | `RNBridgeModule.h/.mm` | Single `RCTEventEmitter <NativeRNBridgeModuleSpec>` — handles both commands and events |
 
 `RNEventEmitter.h/.m` deleted. `RNBridgeModule` is now the single TurboModule for both commands and events.
 
@@ -53,9 +53,9 @@ User code → NotificationsRoot / Commands → NativeCommandsSender
 
 ## Changes per file
 
-### `lib/src/NativeRNBridgeModule.ts` — new file
+### `lib/codegen/NativeRNBridgeModule.js` — codegen source
 
-Codegen spec that drives both iOS and Android TurboModule generation.
+Flow/JS codegen spec that drives both iOS and Android TurboModule generation.
 
 ```ts
 import type { TurboModule } from 'react-native';
@@ -100,16 +100,21 @@ export default TurboModuleRegistry.getEnforcing<Spec>('RNBridgeModule');
 
 ### `package.json` — `codegenConfig`
 
-Required for codegen to generate native interfaces from the TS spec:
+Required for React Native 0.68 codegen discovery to generate native interfaces from the JS spec:
 
 ```json
 "codegenConfig": {
-  "name": "RNNotificationsSpec",
-  "type": "modules",
-  "jsSrcsDir": "lib/src",
-  "android": {
-    "javaPackageName": "com.wix.reactnativenotifications"
-  }
+  "libraries": [
+    {
+      "name": "RNNotificationsSpec",
+      "type": "modules",
+      "jsSrcsDir": "lib/codegen",
+      "android": {
+        "javaPackageName": "com.wix.reactnativenotifications"
+      },
+      "ios": {}
+    }
+  ]
 }
 ```
 
@@ -173,7 +178,7 @@ static NSString* const RNAppNotificationSettingsLinked  = @"appNotificationSetti
 @end
 ```
 
-### `lib/ios/RNBridgeModule.m`
+### `lib/ios/RNBridgeModule.mm`
 
 Key changes from the Old Architecture version:
 
@@ -281,7 +286,7 @@ public void addListener(String eventName) {}
 public void removeListeners(double count) {}
 ```
 
-> **Note:** Android currently keeps `RNNotificationsModule` on `ReactContextBaseJavaModule` and implements `ReactModuleWithSpec`/`TurboModule` instead of extending the codegen-generated `NativeRNBridgeModuleSpec`. This avoids a hard build-time dependency on host-side Android codegen while remaining compatible with New Architecture through `TurboReactPackage` registration.
+> **Note:** With the dedicated Flow codegen spec in `lib/codegen`, Android can extend the generated `NativeRNBridgeModuleSpec` directly and iOS can consume the generated `RNNotificationsSpec` headers through New Architecture codegen discovery.
 
 ---
 

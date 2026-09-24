@@ -45,12 +45,17 @@
   },
   "nativePackage": true,
   "codegenConfig": {
-    "name": "RNNotificationsSpec",
-    "type": "modules",
-    "jsSrcsDir": "lib/src",
-    "android": {
-      "javaPackageName": "com.wix.reactnativenotifications"
-    }
+    "libraries": [
+      {
+        "name": "RNNotificationsSpec",
+        "type": "modules",
+        "jsSrcsDir": "lib/codegen",
+        "android": {
+          "javaPackageName": "com.wix.reactnativenotifications"
+        },
+        "ios": {}
+      }
+    ]
   },
   "peerDependencies": {
     "react": "*",
