@@ -86,14 +86,14 @@ describe('Commands', () => {
 
   describe('setCategories', () => {
     it('sends to native', () => {
-      const emptyCategoriesArray: [NotificationCategory?] = [];
+      const emptyCategoriesArray: NotificationCategory[] = [];
       uut.setCategories(emptyCategoriesArray);
       verify(mockedNativeCommandsSender.setCategories(emptyCategoriesArray)).called();
     });
 
     it('sends to native with categories', () => {
       const category: NotificationCategory = {identifier: 'id', actions: []};
-      const categoriesArray: [NotificationCategory] = [category];
+      const categoriesArray: NotificationCategory[] = [category];
       uut.setCategories(categoriesArray);
       verify(mockedNativeCommandsSender.setCategories(categoriesArray)).called();
     });
@@ -231,8 +231,20 @@ describe('Commands', () => {
 
   describe('getDeliveredNotifications', () => {
     it('sends to native', () => {
+      when(mockedNativeCommandsSender.getDeliveredNotifications()).thenResolve([]);
       uut.getDeliveredNotifications();
       verify(mockedNativeCommandsSender.getDeliveredNotifications()).called();
+    });
+
+    it('maps delivered Android notifications', async () => {
+      Platform.OS = 'android';
+      when(mockedNativeCommandsSender.getDeliveredNotifications()).thenResolve([
+        {'google.message_id': 'id'}
+      ]);
+
+      const notifications = await uut.getDeliveredNotifications();
+
+      expect(notifications).toEqual([new NotificationAndroid({'google.message_id': 'id'})]);
     });
   });
 
